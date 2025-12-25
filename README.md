@@ -11,7 +11,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[在线演示](#) · [功能特性](#-功能特性) · [快速开始](#-快速开始) · [使用指南](#-使用指南)
+[在线演示](https://split.seimo.cn) · [功能特性](#-功能特性) · [快速开始](#-快速开始) · [使用指南](#-使用指南)
 
 ---
 
@@ -20,7 +20,6 @@
 </div>
 
 ## ✨ 功能特性
-
 <table>
 <tr>
 <td width="50%">
