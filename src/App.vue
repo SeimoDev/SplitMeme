@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { ImageInfo, SplitSettings, GridCell, SplitResult } from './types'
 import ImageUploader from './components/ImageUploader.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
@@ -20,6 +20,31 @@ const settings = ref<SplitSettings>({
   quality: 0.9
 })
 const gridCells = ref<GridCell[]>([])
+
+// Toast notifications
+interface Toast {
+  id: number
+  type: 'success' | 'error' | 'info'
+  message: string
+}
+const toasts = ref<Toast[]>([])
+let toastId = 0
+
+const showToast = (type: Toast['type'], message: string) => {
+  const id = ++toastId
+  toasts.value.push({ id, type, message })
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(t => t.id !== id)
+  }, 3000)
+}
+
+// Animation state
+const isAppReady = ref(false)
+onMounted(() => {
+  setTimeout(() => {
+    isAppReady.value = true
+  }, 100)
+})
 
 // Composables
 const { 
@@ -71,24 +96,35 @@ const handleCellsUpdated = (cells: GridCell[]) => {
 const handleSplit = async () => {
   if (!imageInfo.value || gridCells.value.length === 0) return
   
-  await splitImage(
-    imageInfo.value,
-    gridCells.value,
-    settings.value.format,
-    settings.value.quality
-  )
+  try {
+    await splitImage(
+      imageInfo.value,
+      gridCells.value,
+      settings.value.format,
+      settings.value.quality
+    )
+    showToast('success', `Successfully split into ${gridCells.value.length} parts!`)
+  } catch {
+    showToast('error', 'Failed to split image')
+  }
 }
 
 const handleExport = async () => {
   if (results.value.length === 0) return
   
-  const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'split_image'
-  await exportAsZip(results.value, settings.value.format, baseName)
+  try {
+    const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'split_image'
+    await exportAsZip(results.value, settings.value.format, baseName)
+    showToast('success', 'ZIP file downloaded successfully!')
+  } catch {
+    showToast('error', 'Failed to export ZIP')
+  }
 }
 
 const handleDownloadSingle = (result: SplitResult) => {
   const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'image'
   downloadSingle(result, settings.value.format, baseName)
+  showToast('info', `Downloaded part ${result.row + 1}-${result.col + 1}`)
 }
 
 const handleClearResults = () => {
@@ -97,7 +133,22 @@ const handleClearResults = () => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app" :class="{ 'app-ready': isAppReady }">
+    <!-- Toast Notifications -->
+    <div class="toast-container">
+      <div
+        v-for="toast in toasts"
+        :key="toast.id"
+        class="toast"
+        :class="`toast-${toast.type}`"
+      >
+        <span class="toast-icon">
+          {{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ' }}
+        </span>
+        {{ toast.message }}
+      </div>
+    </div>
+
     <header class="header">
       <div class="header-content">
         <h1 class="logo">
@@ -184,6 +235,73 @@ const handleClearResults = () => {
     radial-gradient(ellipse at top left, rgba(0, 217, 165, 0.05) 0%, transparent 50%),
     radial-gradient(ellipse at bottom right, rgba(0, 150, 255, 0.05) 0%, transparent 50%),
     var(--color-bg-primary);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.app.app-ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight 0.3s ease-out;
+  font-size: 0.875rem;
+}
+
+.toast-success {
+  border-color: var(--color-accent);
+}
+
+.toast-success .toast-icon {
+  color: var(--color-accent);
+}
+
+.toast-error {
+  border-color: var(--color-danger);
+}
+
+.toast-error .toast-icon {
+  color: var(--color-danger);
+}
+
+.toast-info .toast-icon {
+  color: var(--color-text-muted);
+}
+
+.toast-icon {
+  font-weight: bold;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .header {

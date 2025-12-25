@@ -216,15 +216,17 @@ const formatFileSize = (bytes: number): string => {
   overflow: hidden;
 }
 
-.upload-zone:hover:not(.has-image) {
+.upload-zone:hover:not(.has-image):not(.is-loading) {
   border-color: var(--color-accent);
   background: var(--color-accent-muted);
+  box-shadow: 0 0 30px rgba(0, 217, 165, 0.1);
 }
 
 .upload-zone.is-dragging {
   border-color: var(--color-accent);
   background: var(--color-accent-muted);
   transform: scale(1.01);
+  box-shadow: 0 0 40px rgba(0, 217, 165, 0.2);
 }
 
 .upload-zone.has-image {
@@ -303,6 +305,12 @@ const formatFileSize = (bytes: number): string => {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md);
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .preview-image {
