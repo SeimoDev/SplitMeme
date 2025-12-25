@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { ImageInfo, SplitSettings } from './types'
+import ImageUploader from './components/ImageUploader.vue'
 
 // State
 const imageInfo = ref<ImageInfo | null>(null)
@@ -14,9 +15,11 @@ const settings = ref<SplitSettings>({
   quality: 0.9
 })
 
-// Placeholder for future implementation
 const handleImageLoad = (info: ImageInfo) => {
   imageInfo.value = info
+  // Auto-adjust custom dimensions based on image size
+  settings.value.customWidth = Math.round(info.width / 2)
+  settings.value.customHeight = Math.round(info.height / 2)
 }
 
 const handleClearImage = () => {
@@ -38,25 +41,27 @@ const handleClearImage = () => {
 
     <main class="main">
       <div class="container">
-        <!-- Placeholder for ImageUploader -->
         <div class="workspace">
           <div class="preview-area card">
-            <div class="upload-placeholder">
-              <div class="upload-icon">📷</div>
-              <h3>Drop your image here</h3>
-              <p class="text-muted">or click to browse</p>
-              <p class="text-sm text-muted mt-md">
-                Supports PNG, JPG, WebP, GIF
-              </p>
-            </div>
+            <ImageUploader 
+              :image-info="imageInfo"
+              @load="handleImageLoad"
+              @clear="handleClearImage"
+            />
           </div>
 
-          <!-- Placeholder for SettingsPanel -->
           <aside class="settings-panel card">
             <h2>Settings</h2>
-            <p class="text-muted mt-md">
-              Upload an image to configure split settings
-            </p>
+            <template v-if="imageInfo">
+              <p class="text-muted mt-md text-sm">
+                Image loaded: {{ imageInfo.width }} × {{ imageInfo.height }} px
+              </p>
+            </template>
+            <template v-else>
+              <p class="text-muted mt-md">
+                Upload an image to configure split settings
+              </p>
+            </template>
           </aside>
         </div>
       </div>
@@ -134,20 +139,6 @@ const handleClearImage = () => {
 
 .preview-area {
   min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.upload-placeholder {
-  text-align: center;
-  padding: var(--spacing-2xl);
-}
-
-.upload-icon {
-  font-size: 4rem;
-  margin-bottom: var(--spacing-md);
-  opacity: 0.7;
 }
 
 .settings-panel {
