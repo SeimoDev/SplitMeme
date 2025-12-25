@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { ImageInfo, SplitSettings, GridCell } from './types'
+import { ref, computed } from 'vue'
+import type { ImageInfo, SplitSettings, GridCell, SplitResult } from './types'
 import ImageUploader from './components/ImageUploader.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import SplitPreview from './components/SplitPreview.vue'
+import ExportPanel from './components/ExportPanel.vue'
+import { useImageSplitter } from './composables/useImageSplitter'
+import { useExporter } from './composables/useExporter'
 
 // State
 const imageInfo = ref<ImageInfo | null>(null)
@@ -18,11 +21,34 @@ const settings = ref<SplitSettings>({
 })
 const gridCells = ref<GridCell[]>([])
 
+// Composables
+const { 
+  isProcessing, 
+  progress, 
+  results, 
+  error: splitError, 
+  splitImage, 
+  clearResults 
+} = useImageSplitter()
+
+const { 
+  isExporting, 
+  exportProgress, 
+  error: exportError, 
+  exportAsZip, 
+  downloadSingle 
+} = useExporter()
+
+// Computed
+const error = computed(() => splitError.value || exportError.value)
+
+// Handlers
 const handleImageLoad = (info: ImageInfo) => {
   imageInfo.value = info
   // Auto-adjust custom dimensions based on image size
   settings.value.customWidth = Math.round(info.width / 2)
   settings.value.customHeight = Math.round(info.height / 2)
+  clearResults()
 }
 
 const handleClearImage = () => {
@@ -31,10 +57,42 @@ const handleClearImage = () => {
   }
   imageInfo.value = null
   gridCells.value = []
+  clearResults()
 }
 
 const handleCellsUpdated = (cells: GridCell[]) => {
   gridCells.value = cells
+  // Clear results when grid changes
+  if (results.value.length > 0) {
+    clearResults()
+  }
+}
+
+const handleSplit = async () => {
+  if (!imageInfo.value || gridCells.value.length === 0) return
+  
+  await splitImage(
+    imageInfo.value,
+    gridCells.value,
+    settings.value.format,
+    settings.value.quality
+  )
+}
+
+const handleExport = async () => {
+  if (results.value.length === 0) return
+  
+  const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'split_image'
+  await exportAsZip(results.value, settings.value.format, baseName)
+}
+
+const handleDownloadSingle = (result: SplitResult) => {
+  const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'image'
+  downloadSingle(result, settings.value.format, baseName)
+}
+
+const handleClearResults = () => {
+  clearResults()
 }
 </script>
 
@@ -88,13 +146,21 @@ const handleCellsUpdated = (cells: GridCell[]) => {
               @update:settings="settings = $event"
             />
 
-            <!-- Export Button Placeholder -->
+            <!-- Export Section -->
             <div v-if="imageInfo" class="export-section">
-              <button class="btn btn-primary btn-lg btn-export" disabled>
-                <span class="btn-icon">📦</span>
-                Export {{ gridCells.length }} Parts
-              </button>
-              <p class="export-hint">Coming in next update...</p>
+              <ExportPanel 
+                :results="results"
+                :format="settings.format"
+                :is-processing="isProcessing"
+                :is-exporting="isExporting"
+                :progress="progress"
+                :export-progress="exportProgress"
+                :error="error"
+                @split="handleSplit"
+                @export="handleExport"
+                @download-single="handleDownloadSingle"
+                @clear="handleClearResults"
+              />
             </div>
           </aside>
         </div>
@@ -166,7 +232,7 @@ const handleCellsUpdated = (cells: GridCell[]) => {
 
 .workspace {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 360px;
   gap: var(--spacing-lg);
   align-items: start;
 }
@@ -211,21 +277,6 @@ const handleCellsUpdated = (cells: GridCell[]) => {
   border-top: 1px solid var(--color-border);
 }
 
-.btn-export {
-  width: 100%;
-}
-
-.btn-icon {
-  font-size: 1.25rem;
-}
-
-.export-hint {
-  text-align: center;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  margin-top: var(--spacing-sm);
-}
-
 .footer {
   padding: var(--spacing-lg);
   text-align: center;
@@ -233,7 +284,7 @@ const handleCellsUpdated = (cells: GridCell[]) => {
 }
 
 /* Responsive */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -241,7 +292,9 @@ const handleCellsUpdated = (cells: GridCell[]) => {
   .settings-area {
     position: static;
   }
+}
 
+@media (max-width: 600px) {
   .header-content {
     flex-direction: column;
     align-items: flex-start;
@@ -251,6 +304,10 @@ const handleCellsUpdated = (cells: GridCell[]) => {
   .tagline {
     padding-left: 0;
     border-left: none;
+  }
+
+  .main {
+    padding: var(--spacing-md);
   }
 }
 </style>
