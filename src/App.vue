@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageInfo, SplitSettings, GridCell, SplitResult } from './types'
 import ImageUploader from './components/ImageUploader.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import SplitPreview from './components/SplitPreview.vue'
 import ExportPanel from './components/ExportPanel.vue'
+import LanguageSwitcher from './components/LanguageSwitcher.vue'
 import { useImageSplitter } from './composables/useImageSplitter'
 import { useExporter } from './composables/useExporter'
+
+const { t } = useI18n()
 
 // State
 const imageInfo = ref<ImageInfo | null>(null)
@@ -103,9 +107,9 @@ const handleSplit = async () => {
       settings.value.format,
       settings.value.quality
     )
-    showToast('success', `Successfully split into ${gridCells.value.length} parts!`)
+    showToast('success', t('toast.splitSuccess', { count: gridCells.value.length }))
   } catch {
-    showToast('error', 'Failed to split image')
+    showToast('error', t('toast.splitError'))
   }
 }
 
@@ -115,16 +119,16 @@ const handleExport = async () => {
   try {
     const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'split_image'
     await exportAsZip(results.value, settings.value.format, baseName)
-    showToast('success', 'ZIP file downloaded successfully!')
+    showToast('success', t('toast.exportSuccess'))
   } catch {
-    showToast('error', 'Failed to export ZIP')
+    showToast('error', t('toast.exportError'))
   }
 }
 
 const handleDownloadSingle = (result: SplitResult) => {
   const baseName = imageInfo.value?.name.replace(/\.[^/.]+$/, '') || 'image'
   downloadSingle(result, settings.value.format, baseName)
-  showToast('info', `Downloaded part ${result.row + 1}-${result.col + 1}`)
+  showToast('info', t('toast.downloadPart', { part: `${result.row + 1}-${result.col + 1}` }))
 }
 
 const handleClearResults = () => {
@@ -151,11 +155,16 @@ const handleClearResults = () => {
 
     <header class="header">
       <div class="header-content">
-        <h1 class="logo">
-          <img src="/logo.png" alt="SplitMeme" class="logo-img" />
-          SplitMeme
-        </h1>
-        <p class="tagline">Image Splitter Tool</p>
+        <div class="header-left">
+          <h1 class="logo">
+            <img src="/logo.png" alt="SplitMeme" class="logo-img" />
+            {{ t('header.title') }}
+          </h1>
+          <p class="tagline">{{ t('header.tagline') }}</p>
+        </div>
+        <div class="header-right">
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
 
@@ -179,7 +188,7 @@ const handleClearResults = () => {
                   {{ imageInfo.name }}
                 </div>
                 <button class="btn btn-secondary" @click="handleClearImage">
-                  Change Image
+                  {{ t('uploader.changeImage') }}
                 </button>
               </div>
               <SplitPreview 
@@ -220,7 +229,7 @@ const handleClearResults = () => {
 
     <footer class="footer">
       <p class="footer-text">
-        Built with ❤️ by 
+        {{ t('footer.builtBy') }}
         <a href="https://x.com/seimodev" target="_blank" rel="noopener" class="footer-link">Seimo</a>
         <span class="footer-divider">·</span>
         <a href="https://github.com/SeimoDev/SplitMeme" target="_blank" rel="noopener" class="footer-link">
@@ -233,7 +242,7 @@ const handleClearResults = () => {
         </a>
       </p>
       <p class="footer-license">
-        Open source under <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" class="footer-link">GPL-3.0</a>
+        {{ t('footer.openSource') }} <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" class="footer-link">GPL-3.0</a>
       </p>
     </footer>
   </div>
@@ -329,7 +338,19 @@ const handleClearResults = () => {
   margin: 0 auto;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-md);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
 .logo {
@@ -467,9 +488,14 @@ const handleClearResults = () => {
 
 @media (max-width: 600px) {
   .header-content {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .header-left {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
 
   .tagline {

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageInfo, SplitSettings, SplitMode, ExportFormat } from '../types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   settings: SplitSettings
@@ -18,10 +21,10 @@ const updateSetting = <K extends keyof SplitSettings>(
   emit('update:settings', { ...props.settings, [key]: value })
 }
 
-const splitModes: { value: SplitMode; label: string; icon: string }[] = [
-  { value: 'uniform', label: 'Uniform Grid', icon: '⊞' },
-  { value: 'custom', label: 'Custom Size', icon: '⊟' }
-]
+const splitModes = computed(() => [
+  { value: 'uniform' as SplitMode, label: t('settings.uniformGrid'), icon: '⊞' },
+  { value: 'custom' as SplitMode, label: t('settings.customSize'), icon: '⊟' }
+])
 
 const exportFormats: { value: ExportFormat; label: string }[] = [
   { value: 'png', label: 'PNG' },
@@ -74,20 +77,20 @@ defineExpose({ isValid, gridInfo })
 
 <template>
   <div class="settings-panel">
-    <h2 class="panel-title">Settings</h2>
+    <h2 class="panel-title">{{ t('settings.title') }}</h2>
 
     <template v-if="imageInfo">
       <!-- Image Info -->
       <div class="image-summary">
         <div class="summary-item">
-          <span class="summary-label">Image Size</span>
+          <span class="summary-label">{{ t('settings.imageSize') }}</span>
           <span class="summary-value">{{ imageInfo.width }} × {{ imageInfo.height }}</span>
         </div>
       </div>
 
       <!-- Split Mode -->
       <div class="section">
-        <label class="section-label">Split Mode</label>
+        <label class="section-label">{{ t('settings.splitMode') }}</label>
         <div class="mode-tabs">
           <button
             v-for="mode in splitModes"
@@ -104,10 +107,10 @@ defineExpose({ isValid, gridInfo })
 
       <!-- Uniform Mode Settings -->
       <div v-if="settings.mode === 'uniform'" class="section">
-        <label class="section-label">Grid Size</label>
+        <label class="section-label">{{ t('settings.gridSize') }}</label>
         <div class="form-row">
           <div class="form-group">
-            <label>Rows</label>
+            <label>{{ t('settings.rows') }}</label>
             <input
               type="number"
               :value="settings.rows"
@@ -117,7 +120,7 @@ defineExpose({ isValid, gridInfo })
             />
           </div>
           <div class="form-group">
-            <label>Columns</label>
+            <label>{{ t('settings.columns') }}</label>
             <input
               type="number"
               :value="settings.cols"
@@ -131,10 +134,10 @@ defineExpose({ isValid, gridInfo })
 
       <!-- Custom Mode Settings -->
       <div v-else class="section">
-        <label class="section-label">Tile Size (px)</label>
+        <label class="section-label">{{ t('settings.tileSize') }}</label>
         <div class="form-row">
           <div class="form-group">
-            <label>Width</label>
+            <label>{{ t('settings.width') }}</label>
             <input
               type="number"
               :value="settings.customWidth"
@@ -144,7 +147,7 @@ defineExpose({ isValid, gridInfo })
             />
           </div>
           <div class="form-group">
-            <label>Height</label>
+            <label>{{ t('settings.height') }}</label>
             <input
               type="number"
               :value="settings.customHeight"
@@ -161,22 +164,22 @@ defineExpose({ isValid, gridInfo })
         <div class="grid-info">
           <div class="info-item">
             <span class="info-value text-accent">{{ gridInfo.totalParts }}</span>
-            <span class="info-label">Total Parts</span>
+            <span class="info-label">{{ t('settings.totalParts') }}</span>
           </div>
           <div class="info-item">
             <span class="info-value">{{ gridInfo.rows }} × {{ gridInfo.cols }}</span>
-            <span class="info-label">Grid</span>
+            <span class="info-label">{{ t('settings.grid') }}</span>
           </div>
           <div class="info-item">
             <span class="info-value">{{ gridInfo.partWidth }} × {{ gridInfo.partHeight }}</span>
-            <span class="info-label">Part Size</span>
+            <span class="info-label">{{ t('settings.partSize') }}</span>
           </div>
         </div>
       </div>
 
       <!-- Export Format -->
       <div class="section">
-        <label class="section-label">Export Format</label>
+        <label class="section-label">{{ t('settings.exportFormat') }}</label>
         <div class="format-options">
           <button
             v-for="format in exportFormats"
@@ -193,7 +196,7 @@ defineExpose({ isValid, gridInfo })
       <!-- Quality Slider (for jpeg/webp) -->
       <div v-if="settings.format !== 'png'" class="section">
         <label class="section-label">
-          Quality: {{ Math.round(settings.quality * 100) }}%
+          {{ t('settings.quality') }}: {{ Math.round(settings.quality * 100) }}%
         </label>
         <input
           type="range"
@@ -210,7 +213,7 @@ defineExpose({ isValid, gridInfo })
     <template v-else>
       <div class="empty-state">
         <div class="empty-icon">📷</div>
-        <p>Upload an image to configure split settings</p>
+        <p>{{ t('settings.uploadHint') }}</p>
       </div>
     </template>
   </div>
@@ -383,4 +386,3 @@ defineExpose({ isValid, gridInfo })
   font-size: 0.9375rem;
 }
 </style>
-

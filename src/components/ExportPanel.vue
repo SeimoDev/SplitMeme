@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { SplitResult, ExportFormat } from '../types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   results: SplitResult[]
@@ -50,11 +53,11 @@ const totalSize = computed(() => {
       >
         <template v-if="isProcessing">
           <span class="spinner-sm"></span>
-          Processing {{ progress }}%
+          {{ t('export.processing') }} {{ progress }}%
         </template>
         <template v-else>
           <span class="btn-icon">✂️</span>
-          Split Image
+          {{ t('export.splitImage') }}
         </template>
       </button>
 
@@ -66,11 +69,11 @@ const totalSize = computed(() => {
         >
           <template v-if="isExporting">
             <span class="spinner-sm"></span>
-            Exporting {{ exportProgress }}%
+            {{ t('export.exporting') }} {{ exportProgress }}%
           </template>
           <template v-else>
             <span class="btn-icon">📦</span>
-            Download ZIP
+            {{ t('export.downloadZip') }}
           </template>
         </button>
 
@@ -79,7 +82,7 @@ const totalSize = computed(() => {
           @click="emit('clear')"
         >
           <span class="btn-icon">🔄</span>
-          Split Again
+          {{ t('export.splitAgain') }}
         </button>
       </template>
     </div>
@@ -93,9 +96,9 @@ const totalSize = computed(() => {
     <!-- Results Preview -->
     <div v-if="hasResults" class="results-preview">
       <div class="results-header">
-        <h3>Split Results</h3>
+        <h3>{{ t('export.results') }}</h3>
         <span class="results-meta">
-          {{ results.length }} parts • {{ formatLabel }} • {{ totalSize }}
+          {{ results.length }} {{ t('export.parts') }} • {{ formatLabel }} • {{ totalSize }}
         </span>
       </div>
 
@@ -105,7 +108,7 @@ const totalSize = computed(() => {
           :key="`${result.row}-${result.col}`"
           class="result-item"
           @click="emit('download-single', result)"
-          :title="`Click to download ${result.row + 1}-${result.col + 1}.${format === 'jpeg' ? 'jpg' : format}`"
+          :title="`${t('export.clickToDownload')} ${result.row + 1}-${result.col + 1}.${format === 'jpeg' ? 'jpg' : format}`"
         >
           <img :src="result.dataUrl" :alt="`Part ${result.row + 1}-${result.col + 1}`" />
           <div class="result-label">
@@ -277,4 +280,3 @@ const totalSize = computed(() => {
   transition: width var(--transition-fast);
 }
 </style>
-

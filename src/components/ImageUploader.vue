@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageInfo } from '../types'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   load: [info: ImageInfo]
@@ -66,7 +69,7 @@ const processFile = async (file: File) => {
   error.value = null
   
   if (!acceptedFormats.includes(file.type)) {
-    error.value = 'Please upload a valid image file (PNG, JPG, WebP, GIF)'
+    error.value = t('uploader.invalidFormat')
     return
   }
 
@@ -92,7 +95,7 @@ const processFile = async (file: File) => {
 
     emit('load', imageInfo)
   } catch (err) {
-    error.value = 'Failed to load image. Please try another file.'
+    error.value = t('uploader.loadError')
     console.error(err)
   } finally {
     isLoading.value = false
@@ -140,7 +143,7 @@ const formatFileSize = (bytes: number): string => {
       <!-- Loading State -->
       <div v-if="isLoading" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading image...</p>
+        <p>{{ t('uploader.loading') }}</p>
       </div>
 
       <!-- Image Preview -->
@@ -149,22 +152,22 @@ const formatFileSize = (bytes: number): string => {
         
         <div class="image-info">
           <div class="info-row">
-            <span class="info-label">File:</span>
+            <span class="info-label">{{ t('uploader.file') }}:</span>
             <span class="info-value">{{ imageInfo.name }}</span>
           </div>
           <div class="info-row">
-            <span class="info-label">Size:</span>
+            <span class="info-label">{{ t('uploader.size') }}:</span>
             <span class="info-value">
               {{ imageInfo.width }} × {{ imageInfo.height }} px
             </span>
           </div>
           <div class="info-row">
-            <span class="info-label">File size:</span>
+            <span class="info-label">{{ t('uploader.fileSize') }}:</span>
             <span class="info-value">{{ formatFileSize(imageInfo.file.size) }}</span>
           </div>
         </div>
 
-        <button class="clear-btn" @click.stop="handleClear" title="Remove image">
+        <button class="clear-btn" @click.stop="handleClear" :title="t('uploader.changeImage')">
           ✕
         </button>
       </div>
@@ -176,8 +179,8 @@ const formatFileSize = (bytes: number): string => {
             <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3>Drop your image here</h3>
-        <p class="text-muted">or click to browse</p>
+        <h3>{{ t('uploader.dropHere') }}</h3>
+        <p class="text-muted">{{ t('uploader.orClick') }}</p>
         <div class="format-hint">
           <span class="format-tag">PNG</span>
           <span class="format-tag">JPG</span>
@@ -393,4 +396,3 @@ const formatFileSize = (bytes: number): string => {
   flex-shrink: 0;
 }
 </style>
-

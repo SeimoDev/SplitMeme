@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ImageInfo, SplitSettings, GridCell } from '../types'
 import { calculateGridCells, calculateCustomGridCells, loadImage } from '../utils/canvas'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   imageInfo: ImageInfo
@@ -178,7 +181,7 @@ defineExpose({ gridCells })
     <div class="preview-footer">
       <span class="preview-hint">
         <span class="hint-icon">ℹ️</span>
-        Grid preview shows how your image will be split
+        {{ t('preview.hint') }}
       </span>
     </div>
   </div>
