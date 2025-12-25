@@ -39,8 +39,9 @@ const handleDrop = (e: DragEvent) => {
   isDragging.value = false
   
   const files = e.dataTransfer?.files
-  if (files && files.length > 0) {
-    processFile(files[0])
+  const firstFile = files?.[0]
+  if (firstFile) {
+    processFile(firstFile)
   }
 }
 
@@ -53,8 +54,9 @@ const handleClick = () => {
 const handleFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   const files = target.files
-  if (files && files.length > 0) {
-    processFile(files[0])
+  const firstFile = files?.[0]
+  if (firstFile) {
+    processFile(firstFile)
   }
   // Reset input for re-uploading same file
   target.value = ''

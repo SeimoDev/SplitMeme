@@ -1,5 +1,5 @@
-import { ref, computed } from 'vue'
-import type { ImageInfo, SplitSettings, SplitResult, GridCell, ExportFormat } from '../types'
+import { ref } from 'vue'
+import type { ImageInfo, SplitResult, GridCell, ExportFormat } from '../types'
 import { loadImage, getMimeType, getFileExtension } from '../utils/canvas'
 
 export function useImageSplitter() {
@@ -29,6 +29,7 @@ export function useImageSplitter() {
 
       for (let i = 0; i < cells.length; i++) {
         const cell = cells[i]
+        if (!cell) continue
         
         // Create canvas for this cell
         const canvas = document.createElement('canvas')

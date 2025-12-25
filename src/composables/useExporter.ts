@@ -34,6 +34,7 @@ export function useExporter() {
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i]
+        if (!result) continue
         const filename = `${result.row + 1}-${result.col + 1}.${ext}`
         
         folder.file(filename, result.blob)
