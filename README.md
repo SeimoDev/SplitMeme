@@ -15,7 +15,7 @@
 
 ---
 
-<img src="https://via.placeholder.com/800x450/1a1a2e/00d9a5?text=SpiltMeme+Preview" alt="SpiltMeme Preview" width="100%" />
+<img src="https://cdn.seimo.cn/SplitMeme.png" alt="SpiltMeme Preview" width="100%" />
 
 </div>
 
