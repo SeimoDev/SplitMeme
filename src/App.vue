@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { ImageInfo, SplitSettings } from './types'
+import type { ImageInfo, SplitSettings, GridCell } from './types'
 import ImageUploader from './components/ImageUploader.vue'
+import SettingsPanel from './components/SettingsPanel.vue'
+import SplitPreview from './components/SplitPreview.vue'
 
 // State
 const imageInfo = ref<ImageInfo | null>(null)
@@ -14,6 +16,7 @@ const settings = ref<SplitSettings>({
   format: 'png',
   quality: 0.9
 })
+const gridCells = ref<GridCell[]>([])
 
 const handleImageLoad = (info: ImageInfo) => {
   imageInfo.value = info
@@ -23,7 +26,15 @@ const handleImageLoad = (info: ImageInfo) => {
 }
 
 const handleClearImage = () => {
+  if (imageInfo.value?.url) {
+    URL.revokeObjectURL(imageInfo.value.url)
+  }
   imageInfo.value = null
+  gridCells.value = []
+}
+
+const handleCellsUpdated = (cells: GridCell[]) => {
+  gridCells.value = cells
 }
 </script>
 
@@ -43,25 +54,48 @@ const handleClearImage = () => {
       <div class="container">
         <div class="workspace">
           <div class="preview-area card">
+            <!-- Upload Zone (when no image) -->
             <ImageUploader 
+              v-if="!imageInfo"
               :image-info="imageInfo"
               @load="handleImageLoad"
               @clear="handleClearImage"
             />
+
+            <!-- Split Preview (when image loaded) -->
+            <template v-else>
+              <div class="preview-header">
+                <div class="image-name">
+                  <span class="name-icon">🖼️</span>
+                  {{ imageInfo.name }}
+                </div>
+                <button class="btn btn-secondary" @click="handleClearImage">
+                  Change Image
+                </button>
+              </div>
+              <SplitPreview 
+                :image-info="imageInfo"
+                :settings="settings"
+                @cells-updated="handleCellsUpdated"
+              />
+            </template>
           </div>
 
-          <aside class="settings-panel card">
-            <h2>Settings</h2>
-            <template v-if="imageInfo">
-              <p class="text-muted mt-md text-sm">
-                Image loaded: {{ imageInfo.width }} × {{ imageInfo.height }} px
-              </p>
-            </template>
-            <template v-else>
-              <p class="text-muted mt-md">
-                Upload an image to configure split settings
-              </p>
-            </template>
+          <aside class="settings-area card">
+            <SettingsPanel 
+              :settings="settings"
+              :image-info="imageInfo"
+              @update:settings="settings = $event"
+            />
+
+            <!-- Export Button Placeholder -->
+            <div v-if="imageInfo" class="export-section">
+              <button class="btn btn-primary btn-lg btn-export" disabled>
+                <span class="btn-icon">📦</span>
+                Export {{ gridCells.length }} Parts
+              </button>
+              <p class="export-hint">Coming in next update...</p>
+            </div>
           </aside>
         </div>
       </div>
@@ -132,23 +166,64 @@ const handleClearImage = () => {
 
 .workspace {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 340px;
   gap: var(--spacing-lg);
   align-items: start;
 }
 
 .preview-area {
   min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
-.settings-panel {
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.image-name {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.name-icon {
+  font-size: 1.25rem;
+}
+
+.settings-area {
   position: sticky;
   top: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
-.settings-panel h2 {
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+.export-section {
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-export {
+  width: 100%;
+}
+
+.btn-icon {
+  font-size: 1.25rem;
+}
+
+.export-hint {
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-sm);
 }
 
 .footer {
@@ -158,12 +233,12 @@ const handleClearImage = () => {
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .workspace {
     grid-template-columns: 1fr;
   }
 
-  .settings-panel {
+  .settings-area {
     position: static;
   }
 
