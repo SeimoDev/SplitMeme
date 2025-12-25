@@ -9,7 +9,8 @@
 [![Vue](https://img.shields.io/badge/Vue-3.4+-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPL_v3-blue?style=flat-square)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-SeimoDev-181717?style=flat-square&logo=github)](https://github.com/SeimoDev/SplitMeme)
 
 [在线演示](https://split.seimo.cn) · [功能特性](#-功能特性) · [快速开始](#-快速开始) · [使用指南](#-使用指南)
 
@@ -84,10 +85,10 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/SpiltMeme.git
+git clone https://github.com/SeimoDev/SplitMeme.git
 
 # 进入目录
-cd SpiltMeme
+cd SplitMeme
 
 # 安装依赖
 npm install
@@ -116,7 +117,6 @@ npm run preview
 
 将图片拖拽到上传区域，或点击选择文件
 
-<img src="https://via.placeholder.com/600x300/252542/00d9a5?text=Step+1:+Upload" alt="Upload" width="100%" />
 
 ### 2️⃣ 配置分割参数
 
@@ -127,7 +127,6 @@ npm run preview
 | 均匀网格 | 按行列数分割 | 3行 × 4列 = 12块 |
 | 自定义尺寸 | 按像素大小分割 | 100×100px 每块 |
 
-<img src="https://via.placeholder.com/600x300/252542/00d9a5?text=Step+2:+Configure" alt="Configure" width="100%" />
 
 ### 3️⃣ 预览与导出
 
@@ -135,7 +134,6 @@ npm run preview
 - 点击 **Download ZIP** 下载全部
 - 点击单个切片可单独下载
 
-<img src="https://via.placeholder.com/600x300/252542/00d9a5?text=Step+3:+Export" alt="Export" width="100%" />
 
 ## 📁 项目结构
 
@@ -169,19 +167,6 @@ SpiltMeme/
 └── 📄 README.md                # 项目文档
 ```
 
-## 🎨 界面预览
-
-<div align="center">
-
-| 暗色主题 | 分割预览 |
-|:--------:|:--------:|
-| <img src="https://via.placeholder.com/400x250/1a1a2e/00d9a5?text=Dark+Theme" width="100%" /> | <img src="https://via.placeholder.com/400x250/1a1a2e/00d9a5?text=Grid+Preview" width="100%" /> |
-
-| 设置面板 | 导出结果 |
-|:--------:|:--------:|
-| <img src="https://via.placeholder.com/400x250/1a1a2e/00d9a5?text=Settings" width="100%" /> | <img src="https://via.placeholder.com/400x250/1a1a2e/00d9a5?text=Results" width="100%" /> |
-
-</div>
 
 ## 🔧 配置说明
 
@@ -211,7 +196,12 @@ SpiltMeme/
 
 ## 📄 开源协议
 
-本项目基于 [MIT License](LICENSE) 开源
+本项目基于 [GNU General Public License v3.0](LICENSE) 开源
+
+这意味着你可以自由地：
+- ✅ 使用、复制、修改和分发本软件
+- ✅ 商业使用
+- ⚠️ 修改后的作品必须以相同协议开源
 
 ---
 
@@ -219,6 +209,8 @@ SpiltMeme/
 
 **如果这个项目对你有帮助，请给一个 ⭐️ Star 支持一下！**
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-SeimoDev%2FSplitMeme-181717?style=for-the-badge&logo=github)](https://github.com/SeimoDev/SplitMeme)
+
+Built with ❤️ by [Seimo](https://x.com/seimodev)
 
 </div>
