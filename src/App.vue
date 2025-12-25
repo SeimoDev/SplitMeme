@@ -152,8 +152,8 @@ const handleClearResults = () => {
     <header class="header">
       <div class="header-content">
         <h1 class="logo">
-          <span class="logo-icon">✂️</span>
-          SpiltMeme
+          <img src="/logo.png" alt="SplitMeme" class="logo-img" />
+          SplitMeme
         </h1>
         <p class="tagline">Image Splitter Tool</p>
       </div>
@@ -340,8 +340,10 @@ const handleClearResults = () => {
   font-weight: 700;
 }
 
-.logo-icon {
-  font-size: 1.75rem;
+.logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .tagline {
